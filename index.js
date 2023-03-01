@@ -72,7 +72,7 @@ module.exports = {
                     log.res_finished = res.finished;
                     if(!res.finished){ // this is when the connection is closed by downstream such as user cancelling request or cloudflare closing the request. 
                         log.res_status_code='504';
-                        log.res_status_message='Unfinished as closed by downstream ';
+                        log.res_status_message='Unfinished as closed by downstream';
                     }
 
                     req._sails.log.info(JSON.stringify(log));
