@@ -14,6 +14,12 @@ options = {
 	eventQueue:{
 		optional,
 		When defined, it will be used to send the log to the queue. This object defines the queue. 
-	}
+	},
+	pg_connection_string:'connection string', 
 }
 ```
+
+
+`pg_connection_string` - this when defined will push server logs to that database. This expects the database to be of a certain structure. 
+
+Refer to `ServerLog.model.js` for the database structure. 

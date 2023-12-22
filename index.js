@@ -2,6 +2,11 @@
 var _ = require('lodash');
 
 
+
+const { Sequelize } = require('sequelize');
+
+var model = require('./ServerLog.model.js');
+
 module.exports = {
     /**
      * @returns {callback}
@@ -10,6 +15,20 @@ module.exports = {
      * @param {*} next 
      */
     getRequestLogger:function(options){
+        if(options.pg_connection_string){
+            const sequelize = new Sequelize(options.pg_connection_string,{
+                dialect: 'postgres',
+                dialectOptions: {
+                    ssl: {
+                        require: true, // This will force the SSL requirement
+                        rejectUnauthorized: false // This is to avoid errors due to self-signed certificates
+                    }
+                },
+                logging: false
+            });
+            var ServerLog = sequelize.define('ServerLog',model.attributes,model.config);
+            // ServerLog.sync();
+        }
 
         return function (req, res, next) {
             // to ignore - req.url starting with /styles,/js,/semantic,/favicon.ico,/health
@@ -50,6 +69,8 @@ module.exports = {
                 req._sails.log.info(JSON.stringify(log));
                 if(options.eventQueue)
                     options.eventQueue.add('serverlog',_.cloneDeep(log));
+                if(ServerLog)
+                        ServerLog.create(log);
 
                 res.on('finish', function () {
                     log.status = 'RESPONDED';
@@ -60,6 +81,8 @@ module.exports = {
                     req._sails.log.info(JSON.stringify(log));
                     if(options.eventQueue)
                         options.eventQueue.add('serverlog',_.cloneDeep(log));
+                    if(ServerLog)
+                        ServerLog.create(log);
                 });
 
                 //To handle the timeout scenarios
@@ -78,6 +101,8 @@ module.exports = {
                     req._sails.log.info(JSON.stringify(log));
                     if(options.eventQueue)
                         options.eventQueue.add('serverlog',_.cloneDeep(log));
+                    if(ServerLog)
+                        ServerLog.create(log);
                 });
             }
             return next();
