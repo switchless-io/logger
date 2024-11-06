@@ -55,6 +55,7 @@ module.exports = {
                     req_user_username: (req.user) ? req.user.username : null,
                     // req_user_details: (req.user) ? req.user : null,
                     req_session_id: req.sessionID,
+                    req_org_id: req.url.split('?')[0].match(/\/orgs?\/([^\/]+)/)?.[1] ?? null
                 };
 
                 // remove sensitive information
